@@ -6,6 +6,10 @@ import { fileURLToPath } from "node:url";
 
 // Highwire's command line, for the agent's own code: every command runs for this project's wallet, inside its policy.
 
+// The project's .env, if there is one (SOLANA_RPC_URL, say): every command the agent runs inherits it.
+const ENV_FILE = fileURLToPath(new URL("../.env", import.meta.url));
+if (existsSync(ENV_FILE)) process.loadEnvFile(ENV_FILE);
+
 export const HOME = process.env.HIGHWIRE_HOME || join(homedir(), ".highwire", "dip-buyer");
 const CLI = fileURLToPath(new URL("../node_modules/highwire-mcp/dist/cli.js", import.meta.url));
 

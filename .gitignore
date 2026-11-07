@@ -5,3 +5,4 @@ wallet.json
 *keypair*.json
 .env
 .env.*
+!.env.example

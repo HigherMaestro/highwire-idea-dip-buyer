@@ -11,6 +11,17 @@ An agent that waits for coins you picked to fall to a price you set, buys a smal
 - Write TypeScript in `src/`. Keep outside services behind one small interface, so the user can swap providers.
 - Run `npm run typecheck` before you say a milestone is done.
 
+## How it runs
+
+`npm start` (`src/start.ts`) is the agent: it runs Highwire's order runner and `src/agent.ts --loop` together, and
+`npm run service -- install` keeps it running. Keep it that way, so the user has one command:
+
+- Put the idea's recurring work in the loop in `src/agent.ts`. Setup that's safe to repeat, such as placing a standing
+  order when none is open, belongs there too: check first, then act, so a restart never doubles anything.
+- A one-off step that spends, such as launching the coin, stays its own command that the user runs. Never call it from
+  the loop.
+- Don't add more long-running processes. If something has to run continuously, run it inside the loop.
+
 ## Never
 
 - **Never set `"live": true`**, and never edit the policy in `~/.highwire/dip-buyer/`. Going live is the user's step. If

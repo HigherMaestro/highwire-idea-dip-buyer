@@ -6,6 +6,10 @@ import { fileURLToPath } from "node:url";
 // Where this agent's wallet, policy, audit log and orders live: outside the repository, one folder per project.
 export const SLUG = "dip-buyer";
 export const ROOT = fileURLToPath(new URL("..", import.meta.url));
+
+// The project's .env, if there is one (SOLANA_RPC_URL, say), for every script and the Highwire commands they run.
+const ENV_FILE = join(ROOT, ".env");
+if (existsSync(ENV_FILE)) process.loadEnvFile(ENV_FILE);
 export const HOME = process.env.HIGHWIRE_HOME || join(homedir(), ".highwire", SLUG);
 export const WALLET = join(HOME, "wallet.json");
 export const POLICY = join(HOME, "policy.json");

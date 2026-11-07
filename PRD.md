@@ -27,9 +27,10 @@ Everything starts as a dry run.
    verdict is `HIGH_RISK`, saying why. Otherwise it places a limit buy with `place_order` (kind `limit_buy`, `sol` the
    coin's `buy_sol`, `trigger_change_pct` minus its `drop_pct`, `expires_in_days` from the watchlist), or with
    `npm run highwire -- orders limit-buy --mint <mint> --sol <sol> --drop-pct <pct>`.
-3. **Fill.** `npm run orders` (Highwire's order runner) runs continuously. It checks each coin's on-chain price from a
-   fresh quote, and buys once the trigger is met, inside the policy.
-4. **Guard.** `npm run agent -- --loop` wakes every 5 minutes. When a limit buy's history shows a fill that was sent,
+3. **Fill.** Highwire's order runner, which `npm start` runs alongside the loop, checks each coin's on-chain price from
+   a fresh quote, and buys once the trigger is met, inside the policy.
+4. **Guard.** The agent's loop (`src/agent.ts --loop`, also in `npm start`) wakes every 5 minutes and arms any coin
+   with no open order, as in step 2. When a limit buy's history shows a fill that was sent,
    it places two orders on the position: a `stop_loss` at the fill price less `stop_pct`, and a `take_profit` at the
    fill price plus `take_pct`, both selling 100%. The fill price is the history entry's `priceSol`.
 5. **One cancels the other.** When either guard's history shows a sent fill, the agent cancels the other with
@@ -38,6 +39,7 @@ Everything starts as a dry run.
 
 All state the agent keeps (each coin's round, order ids, and the time of its last fill) is in
 `~/.highwire/dip-buyer/agent-state.json`, so a restart picks up where it left off and never places an order twice.
+`npm start` runs the whole loop in one process, and `npm run service -- install` keeps it running on a Mac.
 
 ## Policy
 
@@ -86,7 +88,8 @@ limit buy per coin and running it again places none; `npm run typecheck` passes.
 - `src/guard.ts`: given the order book (`OrderBook` from `highwire-agent`, at `~/.highwire/dip-buyer/orders.json`) and
   the agent's state, returns what to do: place guards after a sent limit-buy fill, cancel the other guard after a sent
   guard fill, nothing otherwise. Pure, so it's easy to test.
-- `src/agent.ts` with `--loop`: every 5 minutes, runs `guard.ts` and carries out its plan through `src/tools.ts`.
+- `src/agent.ts` with `--loop`: every 5 minutes, arms any coin with no open order (what `npm run arm` does), runs
+  `guard.ts`, and carries out its plan through `src/tools.ts`.
 - A dry-run trigger (history outcome `dry_run`) places nothing: the agent prints what it would place, with the prices.
 - Unit tests with made-up order books: a sent fill (guards placed once, never twice), a dry-run trigger (nothing
   placed), a stop-loss fill (take-profit cancelled), a take-profit fill (stop-loss cancelled), a failed or unknown fill
@@ -101,7 +104,8 @@ The user does this; the agent only explains it:
 
 1. Fund the wallet with the budget (about 0.3 SOL to start).
 2. Check `coins.allow` lists exactly the watchlist's mints.
-3. Set `"live": true` in the policy, and keep `npm run orders` and `npm run agent -- --loop` running.
+3. Set `"live": true` in the policy, and leave `npm start` running (`npm run service -- install` on a Mac). It picks
+   up the change by itself.
 
 ### M4 · Rounds and a daily summary
 

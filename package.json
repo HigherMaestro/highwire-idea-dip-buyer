@@ -4,9 +4,11 @@
   "type": "module",
   "description": "An agent that waits for coins you picked to fall to a price you set, buys a small amount, then guards each position with a stop-loss and a take-profit.",
   "engines": {
-    "node": ">=20"
+    "node": ">=20.12"
   },
   "scripts": {
+    "start": "tsx src/start.ts",
+    "service": "node scripts/service.mjs",
     "setup": "node scripts/setup.mjs",
     "highwire": "node scripts/highwire.mjs",
     "orders": "node scripts/highwire.mjs orders run",
@@ -15,8 +17,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
-    "highwire-agent": "0.11.0",
-    "highwire-mcp": "0.11.0"
+    "highwire-agent": "0.11.1",
+    "highwire-mcp": "0.11.1"
   },
   "devDependencies": {
     "@types/node": "22.20.5",
