@@ -14,6 +14,24 @@ const LOG = join(HOME, "agent.log");
 const domain = `gui/${process.getuid?.()}`;
 const launchctl = (...args) => spawnSync("launchctl", args, { encoding: "utf8" });
 const xml = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const sleep = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+
+/** Stops the running copy, if there is one, and waits until launchd has let it go: starting again sooner fails. */
+function stop() {
+  launchctl("bootout", `${domain}/${LABEL}`);
+  for (let i = 0; i < 50 && launchctl("print", `${domain}/${LABEL}`).status === 0; i++) sleep(200);
+}
+
+/** Starts it, retrying for a few seconds while launchd still answers "Bootstrap failed: 5" for the copy just stopped. */
+function start() {
+  let r;
+  for (let i = 0; i < 5; i++) {
+    r = launchctl("bootstrap", domain, PLIST);
+    if (r.status === 0) return r;
+    sleep(1000);
+  }
+  return r;
+}
 
 if (process.platform !== "darwin") {
   console.error("This sets up a launchd service, which only macOS has. Run `npm start` under your own process manager.");
@@ -48,9 +66,9 @@ if (command === "install") {
 </plist>
 `;
   mkdirSync(join(homedir(), "Library", "LaunchAgents"), { recursive: true });
-  launchctl("bootout", `${domain}/${LABEL}`);
+  stop();
   writeFileSync(PLIST, plist);
-  const r = launchctl("bootstrap", domain, PLIST);
+  const r = start();
   if (r.status !== 0) {
     console.error(`launchctl couldn't start it: ${r.stderr.trim()}`);
     process.exit(1);
@@ -58,7 +76,7 @@ if (command === "install") {
   console.log(`Running in the background, and at every login. Log: ${LOG}`);
   console.log(`It follows the policy in ${join(HOME, "policy.json")}: a dry run until you set "live": true.`);
 } else if (command === "uninstall") {
-  launchctl("bootout", `${domain}/${LABEL}`);
+  stop();
   if (existsSync(PLIST)) rmSync(PLIST);
   console.log("Stopped, and it won't start at login any more.");
 } else if (command === "status") {
