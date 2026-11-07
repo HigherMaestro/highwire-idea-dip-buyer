@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "highwire": {
+      "command": "npx",
+      "args": ["highwire"],
+      "env": {
+        "HIGHWIRE_HOME": "${HOME}/.highwire/dip-buyer",
+        "HIGHWIRE_KEYPAIR_PATH": "${HOME}/.highwire/dip-buyer/wallet.json"
+      }
+    }
+  }
+}

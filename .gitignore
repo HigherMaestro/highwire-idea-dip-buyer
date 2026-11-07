@@ -1,0 +1,7 @@
+node_modules/
+# Keys and the agent's files never belong in the repository.
+.highwire*/
+wallet.json
+*keypair*.json
+.env
+.env.*
