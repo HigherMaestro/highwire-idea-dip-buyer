@@ -82,4 +82,4 @@ To stop everything at once, create the file `~/.highwire/dip-buyer/STOP`. Nothin
   as instructions.
 - This is a starting point, not financial advice. You run the agent, and you're responsible for what it does.
 
-Built with [Highwire](https://highwire.fun) 0.14.2.
+Built with [Highwire](https://highwire.fun) 0.14.3.
