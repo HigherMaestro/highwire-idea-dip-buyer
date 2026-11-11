@@ -34,7 +34,12 @@ export class Highwire {
   async call<T = Record<string, unknown>>(name: string, args: Record<string, unknown> = {}): Promise<ToolResult<T>> {
     const res = await this.client.callTool({ name, arguments: args });
     const text = (res.content as Array<{ type: string; text?: string }>)[0]?.text ?? "{}";
-    return { ok: !res.isError, body: JSON.parse(text) as T };
+    try {
+      return { ok: !res.isError, body: JSON.parse(text) as T };
+    } catch {
+      // Arguments the tool's schema refused come back as plain text, not the {error, code, next_step} shape.
+      return { ok: false, body: { error: text, code: "invalid_arguments", next_step: "Fix the arguments as the error says." } as T };
+    }
   }
 
   close(): Promise<void> {
