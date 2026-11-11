@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "highwire": {
-      "command": "npx",
-      "args": ["highwire"],
+      "command": "node",
+      "args": ["scripts/highwire.mjs"],
       "env": {
         "HIGHWIRE_HOME": "${HOME}/.highwire/dip-buyer",
         "HIGHWIRE_KEYPAIR_PATH": "${HOME}/.highwire/dip-buyer/wallet.json"
