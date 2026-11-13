@@ -17,9 +17,9 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
-    "highwire-agent": "0.17.0",
-    "highwire-core": "0.17.0",
-    "highwire-mcp": "0.17.0"
+    "highwire-agent": "0.18.0",
+    "highwire-core": "0.18.0",
+    "highwire-mcp": "0.18.0"
   },
   "devDependencies": {
     "@types/node": "22.20.5",
